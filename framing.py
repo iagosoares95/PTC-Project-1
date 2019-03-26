@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 
-class framing:
-    def __init__(self,porta,minbytes=0,maxbytes=256):
+class Framing:
+
+    def __init__(self,porta,minbytes=0,maxbytes=1024):
         self.porta=porta
-        self.minbytes=minbytes
-        self.maxbytes=maxbytes
+        self.min_bytes=minbytes
+        self.max_bytes=maxbytes
         self.state=Enum('States','idle rx esc')
         self.estado=self.state.idle
 

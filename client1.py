@@ -9,9 +9,9 @@ else:
     exit()
 
 porta=sys.argv[1]
-e=enlace.Enlace(porta)
+fra=framing.Framing(porta)
 
 msg=input('Digite um dado para ser enviado:').encode('utf-8')
 msg1=bytearray(msg)
 
-e.send(msg1)
+fra.send(msg1)
