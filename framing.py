@@ -61,16 +61,19 @@ class Framing:
             return self.States.idle
 		
     def reception(self,received):
-        if(received==b\'x7E'):
+        if(received==b'\x7E'):
             return self.States.rx
-        elif(received!=b\'x7E' and received!=b\'x7D'):
+        elif(received!=b'\x7E' and received!=b'\x7D'):
             self.message=self.message+received
             return
-        elif(received==b\'x7D'):
+        elif(received==b'\x7D'):
             return self.States.esc
 
     def escape(self,received):
-        if(self.received == )
+        if(received==b'\x7E' or received==b'\x7E'):
+            return self.Sates.idle
+        else:
+            correcmsg=self.xor(received)
 
     def xor(self,received):
         received1=received^0x20
