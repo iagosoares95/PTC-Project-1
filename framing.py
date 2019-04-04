@@ -71,7 +71,7 @@ class Framing:
 
     def escape(self,received):
         if(received==b'\x7E' or received==b'\x7E'):
-            return self.Sates.idle
+            return self.States.idle
         else:
             correcmsg=self.xor(received)
 
