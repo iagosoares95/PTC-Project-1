@@ -13,17 +13,27 @@ class Arq:
         self.fra=fra
         self.event=None
         self.timeout=timeout
-        self.senddat=bytearray()
         self.data=bytearray()
         self.buffer=bytearray()
+        self.data=bytearray()
+        self.nbe=0
+        self.nbr=0
+        self.ctrl_received=bytearray()
+        self.data_received=bytearray()
 
-
-    def send(self,data):
+    def send(self,data_received):
+        if(data_received==bytearray()):
+            print('Informação a ser enviada: 0')
+            return
+        self.event=self.events.payload
+        self.data=data_received
+        self.handle_events(self.event)
 
     def receive(self):
-        while(true):
+        self.data_received=self.fra.recebe()
+        self.event=sel.events.frame
 
-    def handle_formats(self,event):
+    def handle_events(self,event):
         if(event==self.events.payload):
             self.set_timeout()
         elif(event==self.events.frame):
@@ -41,4 +51,15 @@ class Arq:
 
     def make_ack(self):
         ack=bytearray()
+        if(ctrl_received==)
 
+    def make_frame(self):
+        if(self.nbe==0):
+            ctrl=0b00000000
+            self.nbe=1
+        else:
+            ctrl=0b00001000
+            self.nbe=0
+
+        msgsend=bytes(ctrl)+self.data
+        self.fra.send(msgsend)

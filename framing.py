@@ -33,9 +33,6 @@ class Framing:
         while(true):
             msgreceived=self.serial.read()
 
-
-
-
     def handle(self,received):
         if(self.estado==self.state.idle):
             self.estado=self.waiting(received)

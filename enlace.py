@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import poller
 import serial
 import framing
 
@@ -11,9 +11,8 @@ class Enlace:
         self.time=timeout
         self.ser=serial.Serial(serialport,9600,timeout=self.time)
         self.fra=fra.Framing(self.ser,self.time)
+        self.pol=poller.Poller()
 
     def send(self,data):
 
     def receive(self):
-
-
