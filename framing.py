@@ -29,9 +29,10 @@ class Framing:
 
         self.serial.write(sendmsg)
 
-    def receive(self):
-        while(true):
+    def receive(self,received):
             msgreceived=self.serial.read()
+        self.handle(msgreceived)
+        return msgreceived
 
     def handle(self,received):
         if(self.estado==self.state.idle):

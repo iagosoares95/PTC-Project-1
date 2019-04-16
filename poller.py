@@ -21,8 +21,10 @@ class Callback:
       um descritor de arquivo numérico.
       timeout: valor de timeout em segundos, podendo ter parte 
       decimal para expressar fração de segundo'''
+      if timeout < 0: raise ValueError('timeout negativo')
       self.fd = fileobj
       self.timeout = timeout
+      self._enabled_to = True
       self.base_timeout = timeout
 
   def handle(self):
@@ -46,12 +48,16 @@ class Callback:
 
   def disable_timeout(self):
       'Desativa o timeout'
-      if self.base_timeout > 0: self.base_timeout = -self.base_timeout
+      self._enabled_to = False
 
   def enable_timeout(self):
       'Reativa o timeout'
-      if self.base_timeout < 0: self.base_timeout = -self.base_timeout
+      self._enabled_to = True
 
+  @property
+  def timeout_enabled(self):
+      return self._enabled_to
+  
   @property
   def isTimer(self):
       'true se este callback for um timer'
@@ -76,9 +82,10 @@ class Poller:
       self.sched.register(cb.fd, selectors.EVENT_READ, cb)
 
   def _compareTimeout(self, cb, cb_to):
+    if not cb.timeout_enabled: return cb_to
     if not cb_to:
-        if cb.timeout > 0: cb_to = cb
-    elif cb_to.timeout > cb.timeout and cb.timeout > 0:
+        cb_to = cb
+    elif cb_to.timeout > cb.timeout:
       cb_to = cb
     return cb_to
 
