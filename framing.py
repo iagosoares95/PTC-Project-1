@@ -76,3 +76,5 @@ class Framing:
     def xor(self,received):
         received1=received^0x20
         return received1
+
+    def timeout_func(self):

@@ -2,6 +2,7 @@
 import poller
 import serial
 import framing
+import arq
 import session
 from tun import Tun
 
@@ -12,7 +13,9 @@ class Enlace:
         self.max_bytes=maxbytes=1024
         self.time=timeout
         self.ser=serial.Serial(serial_port,9600,timeout=self.time)
-        self.fra=fra.Framing(self.ser,self.time)
+        self.fra=framing.Framing(self.ser,self.time)
+        self.arq=arq.Arq(self.fra,self.time,sessio_id)
+        self.se=session.Session(self.arq,self.time)
         self.pol=poller.Poller()
         self.tun=Tun("obj1",ip1,ip2,mask="255.255.255.252",mtu="1030",qlen="4")
         self.tun.start()
@@ -26,6 +29,11 @@ class Enlace:
 
     def receive(self):
 
+    def timeout_func(self):
+        self.arq.timeout_func()
+        self.fra.timeout_func()
+        self.session.timeout_func()
+
 class Callback_serial(poller.Callback):
 
     def __init__(self,enl):
@@ -38,5 +46,7 @@ class Callback_timer(poller.Callback):
 
     def __init__(self,enl,timeout):
         poller.Callback(None,timeout)
+        self.enl=enl
 
-
+    def handle_timeout(self):
+        self.enl.timeout_func()

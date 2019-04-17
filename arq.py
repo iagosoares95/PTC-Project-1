@@ -63,3 +63,5 @@ class Arq:
 
         msgsend=bytes(ctrl)+self.data
         self.fra.send(msgsend)
+
+    def timeout_func(self):

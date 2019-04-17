@@ -16,3 +16,4 @@ class Session:
 
         def start(self):
 
+        def timeout_func(self):
