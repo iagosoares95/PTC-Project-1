@@ -6,7 +6,7 @@ import select
 
 class Arq:
 
-    def __init__(self,fra,timeout):
+    def __init__(self,fra,timeout,session_id):
         self.events=Enum('Events','payload frame timeout')
         self.states=Enum('States','idle processing')
         self.state=self.states.

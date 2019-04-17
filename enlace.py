@@ -2,6 +2,7 @@
 import poller
 import serial
 import framing
+import session
 from tun import Tun
 
 class Enlace:
@@ -13,18 +14,27 @@ class Enlace:
         self.ser=serial.Serial(serialport,9600,timeout=self.time)
         self.fra=fra.Framing(self.ser,self.time)
         self.pol=poller.Poller()
-        self.tun=Tun("obj1",ip1,ip2,)
+        self.tun=Tun("obj1",ip1,ip2,mask="255.255.255.252",mtu="1030",qlen="3")
+        self.tun.start()
         #self.cal=cal.Callback(self,,1000)
-        self.
+        self.cb_tun=Callback_serial(self)
+        self.cb_timer=Callback_tun()
+        self.cb_serial=Callback
         self.pol.adiciona()
 
     def send(self,data):
 
     def receive(self):
 
-    def callback_serial():
+class Callback_serial:
 
-    def callback_tun():
+    def __init__(self,enl):
 
-    def callback_timer():
+class Callback_tun:
+
+    def __init__(self):
+
+class Callback_timer:
+
+    def __init__(self):
 
