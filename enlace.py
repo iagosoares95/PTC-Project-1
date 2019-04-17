@@ -7,14 +7,14 @@ from tun import Tun
 
 class Enlace:
 
-    def __init__(self,minbytes=0,maxbytes=1024,serialport,timeout,ip1,ip2):
+    def __init__(self,minbytes=0,maxbytes=1024,serial_port,timeout,ip1,ip2,session_id):
         self.mini_bytes=minbytes=0
         self.max_bytes=maxbytes=1024
         self.time=timeout
-        self.ser=serial.Serial(serialport,9600,timeout=self.time)
+        self.ser=serial.Serial(serial_port,9600,timeout=self.time)
         self.fra=fra.Framing(self.ser,self.time)
         self.pol=poller.Poller()
-        self.tun=Tun("obj1",ip1,ip2,mask="255.255.255.252",mtu="1030",qlen="3")
+        self.tun=Tun("obj1",ip1,ip2,mask="255.255.255.252",mtu="1030",qlen="4")
         self.tun.start()
         #self.cal=cal.Callback(self,,1000)
         self.cb_tun=Callback_serial(self)
@@ -26,15 +26,17 @@ class Enlace:
 
     def receive(self):
 
-class Callback_serial:
+class Callback_serial(poller.Callback):
 
     def __init__(self,enl):
 
-class Callback_tun:
+class Callback_tun(poller.Callback):
 
-    def __init__(self):
+    def __init__(self,tun,enl):
 
-class Callback_timer:
+class Callback_timer(poller.Callback):
 
-    def __init__(self):
+    def __init__(self,enl,timeout):
+        poller.Callback(None,timeout)
+
 
