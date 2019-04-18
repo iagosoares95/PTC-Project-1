@@ -37,10 +37,22 @@ class Enlace:
 class Callback_serial(poller.Callback):
 
     def __init__(self,enl):
+        poller.Callback(enl.ser,1000)
+        self.enl=enl
+        self.serial_port=enl.ser
+
+    def handle_timeout(self):
+        print("Timeout!")
 
 class Callback_tun(poller.Callback):
 
     def __init__(self,tun,enl):
+        poller.Callback(tun.fd,1000)
+        self.tun=tun
+        self.enl=enl
+
+    def handle_timeout(self):
+        print("Timeout!")
 
 class Callback_timer(poller.Callback):
 
