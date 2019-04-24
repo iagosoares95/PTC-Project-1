@@ -16,4 +16,10 @@ class Session:
 
         def start(self):
 
+        def ends(self):
+
+        def send(self):
+
+        def receive(self):
+
         def timeout_func(self):
