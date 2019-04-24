@@ -39,10 +39,14 @@ class Callback_serial(poller.Callback):
     def __init__(self,enl):
         poller.Callback(enl.ser,1000)
         self.enl=enl
-        self.serial_port=enl.ser
+        self.serial1=enl.ser
 
     def handle_timeout(self):
         print("Timeout!")
+
+    def handle(self):
+        data_received=self.serial1.read()
+        self.enl.enq.validation(data_received)
 
 class Callback_tun(poller.Callback):
 
@@ -53,6 +57,9 @@ class Callback_tun(poller.Callback):
 
     def handle_timeout(self):
         print("Timeout!")
+
+    def handle(self):
+
 
 class Callback_timer(poller.Callback):
 
