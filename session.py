@@ -17,15 +17,24 @@ class Session:
         self.proto=b'\xff'
         self.CR=b'\x00'
         self.received_data=bytearray()
+        self.begin_conex=False
+        self.send_time=time.time()
 
         def start(self):
+            if(not(self.states in [self.States.disc,self.States.disc,self.States.disc]) and (self.begin_conex==True)):
+                return
+            self.states=self.States.disc
+            self.begin_conex=True
+            self.handle()
+
 
         def ends(self):
 
         def send(self):
-            self.received_data=self.arq.receive()
 
         def receive(self):
+            self.received_data=self.arq.receive()
+            if(self.handle(self)==False)
 
         def timeout_func(self):
 
@@ -34,4 +43,21 @@ class Session:
             self.send_data=self.proto+self.CR
             self.arq.send(self.send_data)
             self.states=self.States.hand1
+
+        def disc_func(self):
+            if(begin_conex==True):
+                print('Iniciando conexão')
+                self.send_CR()
+                self.send_time=time.time()
+                return self.States.hand1
+
+        def hand1_func(self):
+
+        def handle(self):
+            if(self.states==self.States.disc):
+                self.states=self.disc_func()
+                return False
+            if(self.states==self.States.hand1):
+                self.states=self.hand1_func()
+                return False
 

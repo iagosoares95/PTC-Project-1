@@ -28,6 +28,8 @@ class Enlace:
     def send(self,data):
 
     def receive(self):
+        data_received=self.se.recebe()
+
 
     def timeout_func(self):
         self.arq.timeout_func()
