@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import arq
-import enlace
 from enum import Enum
 import time 
 
@@ -19,6 +18,7 @@ class Session:
         self.CC=b'\x01'
         self.CA=b'\x07'
         self.DR=b'\x04'
+        self.DC=b'\x05'
         self.received_data=bytearray()
         self.begin_conex=False
         self.send_time=time.time()
@@ -32,12 +32,17 @@ class Session:
 
 
         def ends(self):
-
-        def send(self):
+            print('Iniciando desconexão')
+            self.send_DR()
+            self.estado=self.States.half1
+            while(True):
+                if(self.handle()==True):
+                    self.states=self.States.disc
+                    return bytearray()
 
         def receive(self):
             self.received_data=self.arq.receive()
-            if(self.handle(self)==False)
+            if(self.handle()==False)
 
         def timeout_func(self):
 
@@ -88,6 +93,21 @@ class Session:
                 return self.States.half2
             return self.States.con
 
+        def half1_func(self):
+            if((self.data_received[1:2]==self.DR) and (self.data_received[2:3]==self.proto)):
+                print('Pedido de desconexão, DR recebido, enviando DC')
+                self.send_data=bytearray()
+                self.send_data=self.DC+self.proto
+                self.arq.send(send_data)
+                return self.States.disc
+            return self.States.half1
+
+        def half2_func(self):
+            if((self.data_received[1:2]==self.DC) and (self.data_received[2:3]==self.proto)):
+                print('Sessão finalizada')
+                return self.States.disc
+            return self.States.half2
+
         def handle(self):
             if(self.states==self.States.disc):
                 self.states=self.disc_func()
@@ -101,5 +121,13 @@ class Session:
             if(self.states==self.States.con):
                 self.states=self.con_func()
                 return False
+            if(self.states==self.States.half1):
+                self.states=self.half1_func()
+                if(self.states==self.States.disc):
+                    return True
+                return False
             if(self.states==self.States.half2):
-                self.states=self
+                self.states=self.half2_func()
+                if(self.states==self.States.disc):
+                    return True
+                return False
