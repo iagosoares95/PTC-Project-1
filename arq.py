@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import framing
-import enlace
 from enum import Enum
 import select
 
@@ -13,29 +12,40 @@ class Arq:
         self.fra=fra
         self.event=None
         self.timeout=timeout
-        self.data=bytearray()
+        self.data_send=bytearray()
         self.buffer=bytearray()
-        self.data=bytearray()
         self.nbe=0
         self.nbr=0
         self.ctrl_received=bytearray()
         self.data_received=bytearray()
+        self.session_ID=session_id
 
-    def send(self,data_received):
-        if(data_received==bytearray()):
+    def send(self,data):
+        if(data==bytearray()):
             print('Informação a ser enviada: 0')
             return
         self.event=self.events.payload
-        self.data=data_received
+        self.data_send=data
         self.handle_events(self.event)
+        return
 
     def receive(self):
+        self.data_received=bytearray()
         self.data_received=self.fra.recebe()
-        self.event=sel.events.frame
+        if(self.data_received==bytearray()):
+            print('Nada foi recebido')
+            return bytearray()
+        self.event=sel.events.frame()
+        self.handle(self.events)
+        return self.data_received
 
     def handle_events(self,event):
         if(event==self.events.payload):
-            self.set_timeout()
+            self.data_received=bytearray()
+            self.data=self.fra.recebe()
+            if(len(self.data_received)==0):
+                return self.
+            self.frame_func()
         elif(event==self.events.frame):
 
         elif(event==self.events.timeout):
@@ -64,4 +74,12 @@ class Arq:
         msgsend=bytes(ctrl)+self.data
         self.fra.send(msgsend)
 
+    def frame_func(self):
+        if(self.data_received[1:2]!=self.session_ID):
+            print('Pacote recebido de outra sessão')
+            self.data_received=bytearray()
+            return self.state.idle
+        control=data_received[0]
+        if(((control & 0b10000000)>>7)==1):
+        
     def timeout_func(self):

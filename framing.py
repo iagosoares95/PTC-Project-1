@@ -34,7 +34,7 @@ class Framing:
         self.serial.write(sendmsg)
 
     def receive(self,received):
-            msgreceived=self.serial.read()
+        msgreceived=self.serial.read()
         self.handle(msgreceived)
         return msgreceived
 
@@ -86,7 +86,7 @@ class Framing:
         received1=received^0x20
         return received1
 
-    def timeout_func(self):
+    #def timeout_func(self):
 
     def validation(self,received):
         if(self.handle(received)==True):
@@ -95,5 +95,3 @@ class Framing:
             self.fcs.update(data)
             crc_ok=self.fcs.check_crc()
             if(crc_ok==True):
-
-
