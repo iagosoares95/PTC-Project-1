@@ -63,7 +63,7 @@ class Arq:
         ack=bytearray()
         if(ctrl_received==)
 
-    def make_frame(self):
+    def make_frame(self,nbe):
         if(self.nbe==0):
             ctrl=0b00000000
             self.nbe=1
@@ -81,5 +81,14 @@ class Arq:
             return self.state.idle
         control=data_received[0]
         if(((control & 0b10000000)>>7)==1):
+            if(((control & 0b00001000)>>3)==self.nbe):
+                self.data_received=bytearray()
+                return self.states.idle
+        elif(((control & 0b10000000)>>7)==0):
+            if(((control & 0b00001000)>>3)==self.nbr):
+                self.make_ack(self.nbr)
+                return self.states.idle
         
+    def payload_func(self):
+
     def timeout_func(self):
