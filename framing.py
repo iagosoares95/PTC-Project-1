@@ -14,7 +14,8 @@ class Framing:
         self.message=bytearray()
         self.frame_d=0
         self.max_bytes=1024
-        self.fcs=crc.CRC16()
+        self.fcs=crc.CRC16('')
+        self.message_verified
 
     def send(self,msg):
         finalmsg=bytearray()
@@ -25,7 +26,7 @@ class Framing:
 
         for i in range (0,len(msgcrc)):
             if((msgcrc==0x7E) or (msgcrc==0x7D)):
-                finalmsg=finalmsg+b'\x7D'+bytes([self._xor20(msgcrc[i])])
+                finalmsg=finalmsg+b'\x7D'+bytes([self.xor(msgcrc[i])])
             else:
                 finalmsg=finalmsg+bytes([msgcrc[i]])
 
@@ -95,3 +96,7 @@ class Framing:
             self.fcs.update(data)
             crc_ok=self.fcs.check_crc()
             if(crc_ok==True):
+                self.message_verified=data[0:-2]
+                return True
+            else:
+                return False

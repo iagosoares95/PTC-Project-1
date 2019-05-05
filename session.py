@@ -42,7 +42,12 @@ class Session:
 
         def receive(self):
             self.received_data=self.arq.receive()
-            if(self.handle()==False)
+            if(self.handle()==False):
+                data=self.received_data
+                self.received_data=bytearray()
+                return data
+            else:
+                return bytearray()
 
         def timeout_func(self):
 

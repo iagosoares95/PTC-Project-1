@@ -28,6 +28,9 @@ class Enlace:
 
     def receive(self):
         data_received=self.se.recebe()
+        if((type(data_received)==bytearray) and (data_received!=bytearray())):
+            print('Pacote recebido: %s' % data_received)
+            self.tun.send_frame(data_received,Tun.PROTO_IPV4)
 
     def timeout_func(self):
         self.arq.timeout_func()
@@ -46,7 +49,8 @@ class Callback_serial(poller.Callback):
 
     def handle(self):
         data_received=self.serial1.read()
-        self.enl.fra.validation(data_received)
+        if(self.enl.fra.validation(data_received)==True):
+            self.enl.receive()
 
 class Callback_tun(poller.Callback):
 
