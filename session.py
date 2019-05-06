@@ -30,7 +30,6 @@ class Session:
             self.begin_conex=True
             self.handle()
 
-
         def ends(self):
             print('Iniciando desconexão')
             self.send_DR()
@@ -50,6 +49,19 @@ class Session:
                 return bytearray()
 
         def timeout_func(self):
+            if(self.states==self.States.hand1):
+                time_diff=time.time()-self.send_time
+                if(time_diff>self.timeout):
+                    self.send_CR()
+            if(self.states==self.States.hand2):
+                time_diff=time.time()-self.send_time
+                if(time_diff>self.timeout):
+                    self.states=self.States.disc
+                    self.start=False
+            if((self.states==self.States.half1) or (self.states==self.States.half2)):
+                time_diff=time.time()-self.send_time
+                if(time_diff>self.timeout):
+                    self.send_DR()
 
         def send_CR(self):
             self.send_data=bytearray()
