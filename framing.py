@@ -9,8 +9,8 @@ class Framing:
         self.serial=serial
         self.min_bytes=minbytes
         self.max_bytes=maxbytes
-        self.state=Enum('States','idle rx esc')
-        self.estado=self.state.idle
+        self.States=Enum('States','idle rx esc')
+        self.state=self.States.idle
         self.message=bytearray()
         self.frame_d=0
         self.max_bytes=1024
@@ -40,18 +40,18 @@ class Framing:
         return msgreceived
 
     def handle(self,received):
-        if(self.estado==self.state.idle):
-            self.estado=self.waiting(received)
+        if(self.state==self.States.idle):
+            self.state=self.waiting(received)
             return False
 
-        elif(self.estado==self.state.rx):
-            self.estado=self.reception(received)
-            if(self.estado==self.state.ocioso):
+        elif(self.state==self.States.rx):
+            self.state=self.reception(received)
+            if(self.state==self.States.idle):
                 return True
             return False
 
-        elif(self.estado==self.state.esc):
-            self.estado=self.escape(received)
+        elif(self.state==self.States.esc):
+            self.state=self.escape(received)
             return False
 
     def waiting(self,received):
@@ -87,7 +87,8 @@ class Framing:
         received1=received^0x20
         return received1
 
-    #def timeout_func(self):
+    def timeout_func(self):
+        if(self.state in [self.States.rx, self.States.esc]):
 
     def validation(self,received):
         if(self.handle(received)==True):

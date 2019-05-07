@@ -58,7 +58,7 @@ class Session:
                 if(time_diff>self.timeout):
                     self.states=self.States.disc
                     self.start=False
-            if((self.states==self.States.half1) or (self.states==self.States.half2)):
+            if(self.states in[self.States.half1, self.States.half2]):
                 time_diff=time.time()-self.send_time
                 if(time_diff>self.timeout):
                     self.send_DR()

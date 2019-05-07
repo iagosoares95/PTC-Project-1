@@ -6,9 +6,9 @@ import select
 class Arq:
 
     def __init__(self,fra,timeout,session_id):
-        self.events=Enum('Events','payload frame timeout')
-        self.states=Enum('States','idle processing')
-        self.state=self.states.idle
+        self.Events=Enum('Events','payload frame timeout')
+        self.States=Enum('States','idle processing')
+        self.state=self.States.idle
         self.fra=fra
         self.event=None
         self.timeout=timeout
@@ -25,7 +25,7 @@ class Arq:
         if(data==bytearray()):
             print('Informação a ser enviada: 0')
             return
-        self.event=self.events.payload
+        self.event=self.Events.payload
         self.data_send=bytearray()
         self.data_send=data
         self.handle_events(self.event)
@@ -37,35 +37,35 @@ class Arq:
         if(self.data_received==bytearray()):
             print('Nada foi recebido')
             return bytearray()
-        self.event=sel.events.frame()
-        self.handle(self.events)
+        self.event=self.Events.frame()
+        self.handle(self.event)
         return self.data_received
 
     def handle(self,event):
-        if(self.state==self.states.idle):
+        if(self.state==self.States.idle):
             self.state=self.idle_func(event)
             return self.state
-        elif(self.state==self.states.processing):
+        elif(self.state==self.States.processing):
             self.state=self.processing_func(event)
             return self.state
 
     def idle_func(self,event_received):
-        if(event_received==self.events.frame):
+        if(event_received==self.Events.frame):
             self.frame_func()
             return self.state
-        elif(event_received==self.events.payload):
+        elif(event_received==self.Events.payload):
             if(self.nbe==0):
                 sel.nbe=1
             else:
                 self.nbe=0
-            return self.self.payload_func
+            return self.payload_func
 
     def processing_func(self,event_received):
-        if(event_received==self.events.frame):
+        if(event_received==self.Events.frame):
             return self.frame_func()
-        elif(event_received==self.events.payload):
+        elif(event_received==self.Events.payload):
 
-        return self.states.processing
+        return self.States.processing
 
     def make_ack(self,param):
         ack=bytearray()
@@ -87,7 +87,7 @@ class Arq:
         data_send=bytes([ctrl])+bytes([session_ID])+self.data_send
         self.fra.send(data_send)
         self.time_send=time.time()
-        return self.states.processing
+        return self.States.processing
 
     def frame_func(self):
         if(self.data_received[1:2]!=self.session_ID):
@@ -98,7 +98,7 @@ class Arq:
         if(((control & 0b10000000)>>7)==1):
             if(((control & 0b00001000)>>3)==self.nbe):
                 self.data_received=bytearray()
-                return self.states.idle
+                return self.States.idle
         elif(((control & 0b10000000)>>7)==0):
             if(((control & 0b00001000)>>3)==self.nbr):
                 self.make_ack(self.nbr)
@@ -108,7 +108,7 @@ class Arq:
                 return self.state
         
     def timeout_func(self):
-        if(seld.state==self.states.processing):
+        if(seld.state==self.States.processing):
             time_diff=time.time()-self.time_send
             if(time_diff>self.timeout):
                 self.make_frame()
