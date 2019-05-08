@@ -2,6 +2,7 @@
 from enum import Enum
 import crc
 from binascii import unhexlify
+import time
 
 class Framing:
 
@@ -16,6 +17,7 @@ class Framing:
         self.max_bytes=1024
         self.fcs=crc.CRC16('')
         self.message_verified
+        self.send_time=time.time()
 
     def send(self,msg):
         finalmsg=bytearray()
@@ -62,6 +64,7 @@ class Framing:
             return self.States.idle
 		
     def reception(self,received):
+        self.send_time=time.time()
         if(received==b'\x7E'):
             self.frame_d=self.frame_d+1
             if(self.frame_d==2):
@@ -78,10 +81,14 @@ class Framing:
             return self.States.esc
 
     def escape(self,received):
+        self.send_time=time.time()
         if(received==b'\x7E' or received==b'\x7E'):
+            self.message=bytearray()
             return self.States.idle
         else:
-            correcmsg=self.xor(received)
+            correct_msg=self.xor(received[0])
+            self.message=self.message+bytes([correct_msg])
+            return self.States.rx
 
     def xor(self,received):
         received1=received^0x20
@@ -89,6 +96,10 @@ class Framing:
 
     def timeout_func(self):
         if(self.state in [self.States.rx, self.States.esc]):
+            time_diff=time.time()-self.send_time
+            if(time_diff>timeout):
+                self.message=bytearray()
+                return self.States.idle
 
     def validation(self,received):
         if(self.handle(received)==True):
