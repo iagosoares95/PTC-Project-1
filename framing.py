@@ -111,4 +111,5 @@ class Framing:
                 self.message_verified=data[0:-2]
                 return True
             else:
+                data=bytearray()
                 return False
