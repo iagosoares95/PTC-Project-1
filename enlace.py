@@ -24,7 +24,12 @@ class Enlace:
         self.cb_serial=Callback
         self.pol.adiciona()
 
-    #def send(self,data):
+    def send(self,data):
+        if(self.se.state()!=con):
+            self.se.start
+        print('Enviando: %s' % data)
+        self.se.send(data)
+        return
 
     def receive(self):
         data_received=self.se.recebe()
@@ -62,8 +67,9 @@ class Callback_tun(poller.Callback):
     def handle_timeout(self):
         print("Timeout!")
 
-    #def handle(self):
-
+    def handle(self):
+       proto,data=self.tun.get_frame()
+       self.enl.envia(data)
 
 class Callback_timer(poller.Callback):
 

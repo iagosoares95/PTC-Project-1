@@ -29,6 +29,11 @@ class Session:
             self.states=self.States.disc
             self.begin_conex=True
             self.handle()
+            while(True):
+                if(self.handle()==False):
+                    return
+                else:
+                    return self.ends()
 
         def ends(self):
             print('Iniciando desconexão')
@@ -38,6 +43,13 @@ class Session:
                 if(self.handle()==True):
                     self.states=self.States.disc
                     return bytearray()
+
+        def send(self,data):
+            if(self.state()!=con):
+                #self.start()
+                return
+            self.send_data=bytearray()
+            self.send_data=b'\x00'+dado
 
         def receive(self):
             self.received_data=self.arq.receive()
@@ -104,6 +116,7 @@ class Session:
             return self.States.hand2
 
         def con_func(self):
+            if(self.
             if((self.data_received[1:2]==self.DR) and (self.data_received[2:3]==self.proto)):
                 print('Pedido de desconexão, DR recebido')
                 self.send_DR()
@@ -148,3 +161,6 @@ class Session:
                 if(self.states==self.States.disc):
                     return True
                 return False
+        
+        def state(self):
+            return self.states
