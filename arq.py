@@ -37,7 +37,7 @@ class Arq:
         if(self.data_received==bytearray()):
             print('Nada foi recebido')
             return bytearray()
-        self.event=self.Events.frame()
+        self.event=self.Events.frame
         self.handle(self.event)
         return self.data_received
 
@@ -58,13 +58,17 @@ class Arq:
                 sel.nbe=1
             else:
                 self.nbe=0
-            return self.payload_func
+            return self.make_frame()
 
     def processing_func(self,event_received):
         if(event_received==self.Events.frame):
             return self.frame_func()
         elif(event_received==self.Events.payload):
-
+            self.data_received=self.fra.receive()
+            self.frame_func()
+            if(self.data_received!=bytearray()):
+                return self.make_frame()
+            return self.state
         return self.States.processing
 
     def make_ack(self,param):

@@ -6,7 +6,7 @@ import time
 
 class Framing:
 
-    def __init__(self,serial,minbytes=0,maxbytes=1024,timeout):
+    def __init__(self,serial,timeout,minbytes=0,maxbytes=1024):
         self.serial=serial
         self.min_bytes=minbytes
         self.max_bytes=maxbytes
