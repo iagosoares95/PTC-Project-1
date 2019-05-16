@@ -13,10 +13,13 @@ class Enlace:
         self.time=timeout
         self.ser=serial.Serial(serial_port,9600,timeout=self.time)
         self.fra=framing.Framing(self.ser,self.time)
-        self.arq=arq.Arq(self.fra,self.time,sessio_id)
+        self.arq=arq.Arq(self.fra,self.time,session_id)
         self.se=session.Session(self.arq,self.time)
         self.pol=poller.Poller()
-        self.tun=Tun("obj1",ip1,ip2,mask="255.255.255.252",mtu="1030",qlen="4")
+        if(int(ip1[-1])<int(ip2[-1])):
+            self.tun=Tun("obj1",ip1,ip2,mask="255.255.255.252",mtu="1030",qlen="4")
+        else:
+            self.tun=Tun("obj2",ip1,ip2,mask="255.255.255.252",mtu="1030",qlen="4")
         self.tun.start()
         #self.cal=cal.Callback(self,,1000)
         self.cb_tun=Callback_serial(self)

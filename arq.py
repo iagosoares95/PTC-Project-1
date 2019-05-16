@@ -2,6 +2,7 @@
 import framing
 from enum import Enum
 import select
+import time
 
 class Arq:
 

@@ -16,7 +16,7 @@ class Framing:
         self.frame_d=0
         self.max_bytes=1024
         self.fcs=crc.CRC16('')
-        self.message_verified
+        self.message_verified=bytearray()
         self.send_time=time.time()
 
     def send(self,msg):
@@ -37,8 +37,8 @@ class Framing:
         self.serial.write(sendmsg)
 
     def receive(self,received):
-        msgreceived=self.serial.read()
-        self.handle(msgreceived)
+        msgreceived=self.message_verified
+        self.message_verified=bytearray()
         return msgreceived
 
     def handle(self,received):
