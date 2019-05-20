@@ -16,16 +16,19 @@ class Enlace:
         self.arq=arq.Arq(self.fra,self.time,session_id)
         self.se=session.Session(self.arq,self.time)
         self.pol=poller.Poller()
-        if(int(ip1[-1])<int(ip2[-1])):
-            self.tun=Tun("obj1",ip1,ip2,mask="255.255.255.252",mtu="1030",qlen="4")
+        if(ip1[-1]<ip2[-1]):
+            self.tun=Tun("obj1",ip1,ip2,mask="255.255.255.252",mtu=1030,qlen=4)
         else:
-            self.tun=Tun("obj2",ip1,ip2,mask="255.255.255.252",mtu="1030",qlen="4")
+            self.tun=Tun("obj2",ip1,ip2,mask="255.255.255.252",mtu=1030,qlen=4)
         self.tun.start()
         #self.cal=cal.Callback(self,,1000)
-        self.cb_tun=Callback_serial(self)
-        self.cb_timer=Callback_tun()
-        self.cb_serial=Callback
-        self.pol.adiciona()
+        self.callback_tun=Callback_tun(self.tun,self)
+        self.callback_timer=Callback_timer(self,0.05)
+        self.callback_serial=Callback_serial(self)
+        self.pol.adiciona(self.callback_tun)
+        self.pol.adiciona(self.callback_timer)
+        self.pol.adiciona(self.callback_serial)
+        sel.pol.despache()
 
     def send(self,data):
         if(self.se.state()!=con):

@@ -17,4 +17,4 @@ if(sessionid < 0 or sessionid > 255):
     print("O número da sessão deve ficar entre 0 e 255.")
     sys.exit(0)
 
-enl=enlace.Enlace(port,session_id,timeout,my_ip,other_ip)
+enl=enlace.Enlace(port,timeout,my_ip,other_ip,session_id)
