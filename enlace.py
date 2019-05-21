@@ -28,7 +28,7 @@ class Enlace:
         self.pol.adiciona(self.callback_tun)
         self.pol.adiciona(self.callback_timer)
         self.pol.adiciona(self.callback_serial)
-        sel.pol.despache()
+        self.pol.despache()
 
     def send(self,data):
         if(self.se.state()!=con):
@@ -46,12 +46,12 @@ class Enlace:
     def timeout_func(self):
         self.arq.timeout_func()
         self.fra.timeout_func()
-        self.session.timeout_func()
+        self.se.timeout_func()
 
 class Callback_serial(poller.Callback):
 
     def __init__(self,enl):
-        poller.Callback(enl.ser,1000)
+        poller.Callback.__init__(self,enl.ser,1000)
         self.enl=enl
         self.serial1=enl.ser
 
@@ -66,7 +66,7 @@ class Callback_serial(poller.Callback):
 class Callback_tun(poller.Callback):
 
     def __init__(self,tun,enl):
-        poller.Callback(tun.fd,1000)
+        poller.Callback.__init__(self,tun.fd,1000)
         self.tun=tun
         self.enl=enl
 
@@ -80,7 +80,7 @@ class Callback_tun(poller.Callback):
 class Callback_timer(poller.Callback):
 
     def __init__(self,enl,timeout):
-        poller.Callback(None,timeout)
+        poller.Callback.__init__(self,None,timeout)
         self.enl=enl
 
     def handle_timeout(self):

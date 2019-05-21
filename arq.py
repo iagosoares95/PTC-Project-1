@@ -113,7 +113,7 @@ class Arq:
                 return self.state
         
     def timeout_func(self):
-        if(seld.state==self.States.processing):
+        if(self.state==self.States.processing):
             time_diff=time.time()-self.time_send
             if(time_diff>self.timeout):
                 self.make_frame()
