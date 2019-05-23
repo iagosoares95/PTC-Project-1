@@ -109,7 +109,7 @@ class Poller:
         tout = cb_to.timeout
     else:
         tout = None
-    print('--- tout=%s' % str(tout))
+    #print('--- tout=%s' % str(tout))
     eventos = self.sched.select(tout)
     fired = set()
     if not eventos: # timeout !

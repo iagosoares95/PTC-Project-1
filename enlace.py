@@ -5,6 +5,7 @@ import framing
 import arq
 import session
 from tun import Tun
+import time
 
 class Enlace:
 
@@ -23,7 +24,7 @@ class Enlace:
         self.tun.start()
         #self.cal=cal.Callback(self,,1000)
         self.callback_tun=Callback_tun(self.tun,self)
-        self.callback_timer=Callback_timer(self,0.05)
+        self.callback_timer=Callback_timer(self, 0.01)
         self.callback_serial=Callback_serial(self)
         self.pol.adiciona(self.callback_tun)
         self.pol.adiciona(self.callback_timer)
@@ -31,22 +32,22 @@ class Enlace:
         self.pol.despache()
 
     def send(self,data):
-        if(self.se.state()!=con):
-            self.se.start
+        if(self.se.state()!="con"):
+            self.se.start()
+            return
         print('Enviando: %s' % data)
-        self.se.send(data)
-        return
+        return self.se.send(data)
 
     def receive(self):
-        data_received=self.se.recebe()
+        data_received=self.se.receive()
         if((type(data_received)==bytearray) and (data_received!=bytearray())):
             print('Pacote recebido: %s' % data_received)
             self.tun.send_frame(data_received,Tun.PROTO_IPV4)
 
     def timeout_func(self):
+        self.se.timeout_func()
         self.arq.timeout_func()
         self.fra.timeout_func()
-        self.se.timeout_func()
 
 class Callback_serial(poller.Callback):
 
@@ -74,10 +75,11 @@ class Callback_tun(poller.Callback):
         print("Timeout!")
 
     def handle(self):
-       proto,data=self.tun.get_frame()
-       self.enl.envia(data)
+       data=self.tun.get_frame()
+       self.enl.send(data)
 
 class Callback_timer(poller.Callback):
+    t0 = time.time()
 
     def __init__(self,enl,timeout):
         poller.Callback.__init__(self,None,timeout)

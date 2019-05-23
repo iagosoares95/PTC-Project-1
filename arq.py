@@ -29,7 +29,7 @@ class Arq:
         self.event=self.Events.payload
         self.data_send=bytearray()
         self.data_send=data
-        self.handle_events(self.event)
+        self.handle(self.event)
         return
 
     def receive(self):
@@ -56,7 +56,7 @@ class Arq:
             return self.state
         elif(event_received==self.Events.payload):
             if(self.nbe==0):
-                sel.nbe=1
+                self.nbe=1
             else:
                 self.nbe=0
             return self.make_frame()
@@ -75,31 +75,32 @@ class Arq:
     def make_ack(self,param):
         ack=bytearray()
         ctrl=0b10000000
-        if(self.param==1):
+        if(param==1):
             ctrl=0b10001000
 
         ack=bytes([ctrl])+bytes([self.session_ID])
-        send.fra.envia(ack)
+        self.fra.send(ack)
 
-    def make_frame(self,param):
+    def make_frame(self):
         ctrl=0b00000000
-        if(self.param==1):
+        if(self.nbe==1):
             ctrl=0b00001000
-            self.nbr=0
+            self.nbe=0
         else:
-            self.nbr=1
+            self.nbe=1
 
-        data_send=bytes([ctrl])+bytes([session_ID])+self.data_send
+        data_send=bytes([ctrl])+bytes([self.session_ID])+self.data_send
         self.fra.send(data_send)
         self.time_send=time.time()
         return self.States.processing
 
     def frame_func(self):
-        if(self.data_received[1:2]!=self.session_ID):
+        print("aqui:",self.data_received)
+        if((self.data_received[1:2]!=bytes([self.session_ID]))and(self.data_received!=bytearray())):
             print('Pacote recebido de outra sessão')
             self.data_received=bytearray()
             return self.state
-        control=data_received[0]
+        control=self.data_received[0]
         if(((control & 0b10000000)>>7)==1):
             if(((control & 0b00001000)>>3)==self.nbe):
                 self.data_received=bytearray()

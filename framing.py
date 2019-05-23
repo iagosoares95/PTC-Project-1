@@ -18,6 +18,7 @@ class Framing:
         self.fcs=crc.CRC16('')
         self.message_verified=bytearray()
         self.send_time=time.time()
+        self.timeout=timeout
 
     def send(self,msg):
         finalmsg=bytearray()
@@ -33,10 +34,10 @@ class Framing:
                 finalmsg=finalmsg+bytes([msgcrc[i]])
 
         sendmsg=b'\x7E'+finalmsg+b'\x7E'
-
+        print('Framing send')
         self.serial.write(sendmsg)
 
-    def receive(self,received):
+    def receive(self):
         msgreceived=self.message_verified
         self.message_verified=bytearray()
         return msgreceived
@@ -97,7 +98,7 @@ class Framing:
     def timeout_func(self):
         if(self.state in [self.States.rx, self.States.esc]):
             time_diff=time.time()-self.send_time
-            if(time_diff>timeout):
+            if(time_diff>self.timeout):
                 self.message=bytearray()
                 return self.States.idle
 
