@@ -4,6 +4,7 @@ import enlace
 import arq
 from enum import Enum
 import time 
+import random
 
 class Session:
 
@@ -53,6 +54,7 @@ class Session:
                 return self.ends()
 
     def receive(self):
+        print('Estado da sessão:',self.states)
         self.received_data=self.arq.receive()
         if(self.handle()==False):
             data=self.received_data
@@ -78,16 +80,21 @@ class Session:
 
     def send_CR(self):
         self.send_data=bytearray()
-        self.send_data=self.proto+self.CR
+        self.send_data=self.send_data+self.proto+self.CR
         self.arq.send(self.send_data)
-        print("Requisição de conexão enviada")
+        self.send_time=time.time()
+        print("Requisição de conexão enviada:",self.send_data)
 
     def send_DR(self):
         self.send_data=bytearray()
         self.send_data=self.proto+self.DR
         self.arq.send(self.send_data)
+        self.send_time=time.time()
 
     def disc_func(self):
+        data=self.arq.receive()
+        if(data!=bytearray()):
+            return self.states.hand2
         if(self.begin_conex==True):
             print('Iniciando conexão')
             self.send_CR()

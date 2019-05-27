@@ -21,20 +21,21 @@ class Arq:
         self.data_received=bytearray()
         self.session_ID=session_id
         self.time_send=time.time()
+        self.data=bytearray()
 
     def send(self,data):
         if(data==bytearray()):
             print('Informação a ser enviada: 0')
             return
         self.event=self.Events.payload
-        self.data_send=bytearray()
-        self.data_send=data
+        self.data=bytearray()
+        self.data=data
         self.handle(self.event)
         return
 
     def receive(self):
         self.data_received=bytearray()
-        self.data_received=self.fra.recebe()
+        self.data_received=self.fra.receive()
         if(self.data_received==bytearray()):
             print('Nada foi recebido')
             return bytearray()
@@ -89,14 +90,17 @@ class Arq:
         else:
             self.nbe=1
 
-        data_send=bytes([ctrl])+bytes([self.session_ID])+self.data_send
-        self.fra.send(data_send)
+        self.data_send=bytearray()
+        self.data_send=self.data_send+bytes([ctrl])+bytes([self.session_ID])+self.data
+        self.fra.send(self.data_send)
+        print('Arq enviando:',self.data_send)
         self.time_send=time.time()
         return self.States.processing
 
     def frame_func(self):
-        print("aqui:",self.data_received)
-        if((self.data_received[1:2]!=bytes([self.session_ID]))and(self.data_received!=bytearray())):
+        if(self.data_received==bytearray()):
+            return self.state
+        if((self.data_received[1:2]!=bytes([self.session_ID]))):
             print('Pacote recebido de outra sessão')
             self.data_received=bytearray()
             return self.state

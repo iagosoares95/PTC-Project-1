@@ -33,8 +33,8 @@ class Framing:
             else:
                 finalmsg=finalmsg+bytes([msgcrc[i]])
 
-        sendmsg=b'\x7E'+finalmsg+b'\x7E'
-        print('Framing send')
+        sendmsg=sendmsg+b'\x7E'+finalmsg+b'\x7E'
+        print('Framing send ', sendmsg)
         self.serial.write(sendmsg)
 
     def receive(self):
