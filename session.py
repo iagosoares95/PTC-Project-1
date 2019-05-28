@@ -30,6 +30,9 @@ class Session:
             return
         self.states=self.States.disc
         self.begin_conex=True
+        data=self.arq.receive()
+        if(data!=bytearray()):
+            self.states=self.States.disc
         self.handle()
 
     def ends(self):

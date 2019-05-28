@@ -32,6 +32,9 @@ class Enlace:
         self.pol.despache()
 
     def send(self,data):
+        data1=self.arq.receive()
+        if(data1!=bytearray()):
+            #passa o estado
         if(self.se.state()!="con"):
             self.se.start()
             return
