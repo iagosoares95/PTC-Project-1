@@ -32,9 +32,6 @@ class Enlace:
         self.pol.despache()
 
     def send(self,data):
-        data1=self.arq.receive()
-        if(data1!=bytearray()):
-            #passa o estado
         if(self.se.state()!="con"):
             self.se.start()
             return
@@ -57,13 +54,14 @@ class Callback_serial(poller.Callback):
     def __init__(self,enl):
         poller.Callback.__init__(self,enl.ser,1000)
         self.enl=enl
-        self.serial1=enl.ser
+        self.ser1=enl.ser
 
     def handle_timeout(self):
         print("Timeout!")
 
     def handle(self):
-        data_received=self.serial1.read()
+        data_received=self.ser1.read()
+        print("aqui", data_received)
         if(self.enl.fra.validation(data_received)==True):
             self.enl.receive()
 
@@ -78,8 +76,12 @@ class Callback_tun(poller.Callback):
         print("Timeout!")
 
     def handle(self):
-       data=self.tun.get_frame()
-       self.enl.send(data)
+        data=self.tun.get_frame() 
+        #print(data)
+        data1=self.enl.receive()
+        if((data1!=bytearray())and(data1!=None)):
+            print(data1)
+        self.enl.send(data)
 
 class Callback_timer(poller.Callback):
     t0 = time.time()

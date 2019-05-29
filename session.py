@@ -28,10 +28,11 @@ class Session:
     def start(self):
         if(not(self.states in [self.States.disc,self.States.disc,self.States.disc]) and (self.begin_conex==True)):
             return
-        self.states=self.States.disc
         self.begin_conex=True
         data=self.arq.receive()
         if(data!=bytearray()):
+            self.states=self.States.hand2
+        else:
             self.states=self.States.disc
         self.handle()
 
