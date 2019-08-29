@@ -1,116 +1,65 @@
-# -*- coding: utf-8 -*-
-from enum import Enum
-import crc
-from binascii import unhexlify
-import time
+#!/usr/bin/python3
+
+import serial
 
 class Framing:
 
-    def __init__(self,serial,timeout,minbytes=0,maxbytes=1024):
-        self.serial=serial
-        self.min_bytes=minbytes
-        self.max_bytes=maxbytes
-        self.States=Enum('States','idle rx esc')
-        self.state=self.States.idle
-        self.message=bytearray()
-        self.frame_d=0
-        self.max_bytes=1024
-        self.fcs=crc.CRC16('')
-        self.message_verified=bytearray()
-        self.send_time=time.time()
-        self.timeout=timeout
+    def __init__(self, serial):
+        self.States = Enum('States', 'idle rx esc')
+        self.state = self.States.idle
+        self.buffer = bytearray()
+        self.serial = serial
 
-    def send(self,msg):
-        finalmsg=bytearray()
-        sendmsg=bytearray()
+    def send(self, data):
+        final_data = bytearray()
 
-        fcs=crc.CRC16(msg)
-        msgcrc=fcs.gen_crc()
-
-        for i in range (0,len(msgcrc)):
-            if((msgcrc==0x7E) or (msgcrc==0x7D)):
-                finalmsg=finalmsg+b'\x7D'+bytes([self.xor(msgcrc[i])])
+        for i in range(0, len(data)):
+            if((data[i] == 0x7E) or (data[i] == 0x7E)):
+                trans_byte = bytearray()                
+                trans_byte = data[i] ^ 0x20
+                final_data = final_data + trans_byte
             else:
-                finalmsg=finalmsg+bytes([msgcrc[i]])
-
-        sendmsg=sendmsg+b'\x7E'+finalmsg+b'\x7E'
-        print('Framing send ', sendmsg)
-        self.serial.write(sendmsg)
+                final_data = final_data + bytes([data[i]])
+        final_data = b'\x7E' + data + b'\x7E'
+        self.seria.write(final_data)
 
     def receive(self):
-        msgreceived=self.message_verified
-        self.message_verified=bytearray()
-        return msgreceived
+        while(True):
+            recv_data = self.serial.read()
+            if(recv_data == bytearray()):
+                return 0
+            if(handle(byte)=True):
 
-    def handle(self,received):
-        if(self.state==self.States.idle):
-            self.state=self.waiting(received)
+    def handle(self, byte):
+        if(self.state == self.States.idle):
+            self.state = self.idle_func(byte)
             return False
-
-        elif(self.state==self.States.rx):
-            self.state=self.reception(received)
-            if(self.state==self.States.idle):
+        elif(self.state == self.States.rx):
+            self.state = self.rx_func(byte)
+            if(self.state == self.States.idle)
                 return True
             return False
-
-        elif(self.state==self.States.esc):
-            self.state=self.escape(received)
+        elif(self.state == self.States.esc):
+            self.state = self.esc_func(byte)
             return False
-
-    def waiting(self,received):
-        if(received==b'\x7E'):
-            self.message=bytearray()
+        
+    def idle_func(self, byte):
+        if(byte == b'\x7E'):
+            self.buffer = bytearray()
             return self.States.rx
         else:
             return self.States.idle
-		
-    def reception(self,received):
-        self.send_time=time.time()
-        if(received==b'\x7E'):
-            self.frame_d=self.frame_d+1
-            if(self.frame_d==2):
-                self.frame_d=0
-                return self.States.idle
-            return self.States.rx
-        elif(received!=b'\x7E' and received!=b'\x7D'):
-            self.message=self.message+received
-            if(len(self.message)>self.max_bytes):
-                self.message=bytearray()
-                return self.States.idle
-            return self.States.rx
-        elif(received==b'\x7D'):
+            
+    def rx_func(self, byte):
+        if(byte == b'\x7E'):
+            return self.States
+        elif(byte == b'\x7D')
             return self.States.esc
-
-    def escape(self,received):
-        self.send_time=time.time()
-        if(received==b'\x7E' or received==b'\x7E'):
-            self.message=bytearray()
-            return self.States.idle
-        else:
-            correct_msg=self.xor(received[0])
-            self.message=self.message+bytes([correct_msg])
+        elif(byte != b'\x7D' and byte != b'\x7E')
+            self.buffer = self.buffer + byte
             return self.States.rx
 
-    def xor(self,received):
-        received1=received^0x20
-        return received1
-
-    def timeout_func(self):
-        if(self.state in [self.States.rx, self.States.esc]):
-            time_diff=time.time()-self.send_time
-            if(time_diff>self.timeout):
-                self.message=bytearray()
-                return self.States.idle
-
-    def validation(self,received):
-        if(self.handle(received)==True):
-            data=self.message
-            self.fcs.clear()
-            self.fcs.update(data)
-            crc_ok=self.fcs.check_crc()
-            if(crc_ok==True):
-                self.message_verified=data[0:-2]
-                return True
-            else:
-                data=bytearray()
-                return False
+    def esc_func(self, byte):
+        trans_byte = byte ^ 0x20
+        self.buffer = self.buffer + trans_byte
+        return self.States.rx
