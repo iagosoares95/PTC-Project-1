@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import serial
+import crc
 
 class Framing:
 
@@ -12,14 +13,15 @@ class Framing:
 
     def send(self, data):
         final_data = bytearray()
+        fcs = crc.CRC16(data)
+        data_crc = fcs.gen_crc()
 
         for i in range(0, len(data)):
-            if((data[i] == 0x7E) or (data[i] == 0x7E)):
-                trans_byte = bytearray()                
-                trans_byte = data[i] ^ 0x20
+            if((data_crc[i] == 0x7E) or (data_crc[i] == 0x7E)):
+                trans_byte = b'\x7D' + data_crc[i] ^ 0x20
                 final_data = final_data + trans_byte
             else:
-                final_data = final_data + bytes([data[i]])
+                final_data = final_data + bytes([data_crc[i]])
         final_data = b'\x7E' + data + b'\x7E'
         self.seria.write(final_data)
 
@@ -27,8 +29,16 @@ class Framing:
         while(True):
             recv_data = self.serial.read()
             if(recv_data == bytearray()):
-                return 0
-            if(handle(byte)=True):
+                return bytearray()
+            if(handle(byte) == True):
+                recv_data = self.buffer
+                fcs.clear()
+                fcs.update(recv_data)
+                if(fcs.check_crc() == True):
+                    return recv_data[0:-2]
+                else:
+                    recv_data = bytearray()
+                    return recv_data
 
     def handle(self, byte):
         if(self.state == self.States.idle):
@@ -52,7 +62,7 @@ class Framing:
             
     def rx_func(self, byte):
         if(byte == b'\x7E'):
-            return self.States
+            return self.States.idle
         elif(byte == b'\x7D')
             return self.States.esc
         elif(byte != b'\x7D' and byte != b'\x7E')
