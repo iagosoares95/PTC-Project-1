@@ -46,7 +46,7 @@ class Framing:
             return False
         elif(self.state == self.States.rx):
             self.state = self.rx_func(byte)
-            if(self.state == self.States.idle)
+            if(self.state == self.States.idle):
                 return True
             return False
         elif(self.state == self.States.esc):
@@ -63,9 +63,9 @@ class Framing:
     def rx_func(self, byte):
         if(byte == b'\x7E'):
             return self.States.idle
-        elif(byte == b'\x7D')
+        elif(byte == b'\x7D'):
             return self.States.esc
-        elif(byte != b'\x7D' and byte != b'\x7E')
+        elif(byte != b'\x7D' and byte != b'\x7E'):
             self.buffer = self.buffer + byte
             return self.States.rx
 
