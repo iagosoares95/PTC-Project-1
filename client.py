@@ -15,8 +15,12 @@ if(len(sys.argv) < 2):
 
 client_type = sys.argv[1]
 serial_port = sys.argv[2]
-data = "abcedf1234567"
+data = "abcedf~1234567"
 
 ser = serial.Serial(serial_port, 9600)
-fra = framing.Framing(serial)
-fra.send(data)
+fra = framing.Framing(ser)
+
+if(client_type == "s"):
+    fra.send(data)
+else:
+    fra.receive()

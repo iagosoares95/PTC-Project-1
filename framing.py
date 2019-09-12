@@ -2,6 +2,7 @@
 
 import serial
 import crc
+from enum import Enum
 
 class Framing:
 
@@ -9,36 +10,40 @@ class Framing:
         self.States = Enum('States', 'idle rx esc')
         self.state = self.States.idle
         self.buffer = bytearray()
-        self.serial = serial
+        self.ser = serial
 
     def send(self, data):
         final_data = bytearray()
         fcs = crc.CRC16(data)
         data_crc = fcs.gen_crc()
+        print('crc:',data_crc)
 
-        for i in range(0, len(data)):
+        for i in range(0, len(data_crc)):
             if((data_crc[i] == 0x7E) or (data_crc[i] == 0x7E)):
-                trans_byte = b'\x7D' + data_crc[i] ^ 0x20
-                final_data = final_data + trans_byte
+                trans_byte = bytes([data_crc[i] ^ 0x20])
+                final_data = final_data + b'\x7D' + trans_byte
             else:
                 final_data = final_data + bytes([data_crc[i]])
-        final_data = b'\x7E' + data + b'\x7E'
-        self.seria.write(final_data)
+        final_data = b'\x7E' + final_data + b'\x7E'
+        self.ser.write(final_data)
+        print('Sending: ', final_data)
 
     def receive(self):
         while(True):
-            recv_data = self.serial.read()
+            recv_data = self.ser.read()
             if(recv_data == bytearray()):
                 return bytearray()
-            if(handle(byte) == True):
-                recv_data = self.buffer
+            if(self.handle(recv_data) == True):
+                buf = self.buffer
+                fcs = crc.CRC16('')
                 fcs.clear()
-                fcs.update(recv_data)
+                fcs.update(self.buffer)
                 if(fcs.check_crc() == True):
-                    return recv_data[0:-2]
+                    print('Recebido:',buf[0:-2])
+                    return buf[0:-2]
                 else:
-                    recv_data = bytearray()
-                    return recv_data
+                    buf = bytearray()
+                    return buf
 
     def handle(self, byte):
         if(self.state == self.States.idle):
@@ -70,6 +75,6 @@ class Framing:
             return self.States.rx
 
     def esc_func(self, byte):
-        trans_byte = byte ^ 0x20
-        self.buffer = self.buffer + trans_byte
+        trans_byte = byte[0] ^ 0x20
+        self.buffer = self.buffer + bytes([trans_byte])
         return self.States.rx
