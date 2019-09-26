@@ -16,7 +16,7 @@ class Framing:
         final_data = bytearray()
         fcs = crc.CRC16(data)
         data_crc = fcs.gen_crc()
-        print('crc:',data_crc)
+        #print('crc:',data_crc)
 
         for i in range(0, len(data_crc)):
             if((data_crc[i] == 0x7E) or (data_crc[i] == 0x7E)):

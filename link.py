@@ -6,14 +6,15 @@ import serial
 import poller
 
 class Link:
-    def __init__(self, serial_port, ip1, ip2):
+    def __init__(self, serial_port, ip1, ip2, client_type):
         self.serial = serial.Serial(serial_port, 9600)
         self.fra = framing.Framing(self.serial)
         self.tun = Tun("tun1", ip1, ip2, mask="255.255.255.252", mtu=1500, qlen=4)
         self.tun.start()
         self.pol = poller.Poller()
-        self.tun_callback = TunCallback(self.tun,self)
-        self.pol.adiciona(self.tun_callback)
+        if(client_type == "s"):
+            self.tun_callback = TunCallback(self.tun,self)
+            self.pol.adiciona(self.tun_callback)
         self.serial_callback = SerialCallback(self)
         self.pol.adiciona(self.serial_callback)
         self.pol.despache()
@@ -36,17 +37,17 @@ class TunCallback(poller.Callback):
         self.link = link
 
     def handle(self):
-        proto, payload = self.tun1.get_frama()
+        proto, payload = self.tun1.get_frame()
         print("Lido: ", payload)
         self.link.send(payload)
 
 class SerialCallback(poller.Callback):
     def __init__(self,link):
-        poller.Callback.__init__(self, link.ser)
+        poller.Callback.__init__(self, link.serial)
         self.link = link
-        self.ser1 = link.ser
+        self.serial1 = link.serial
 
     def handle(self):
-        recv_data = self.ser1.read()
+        recv_data = self.serial1.read()
         if(recv_data != bytearray()):
-            self.ser1.receive()
+            self.serial1.read()
