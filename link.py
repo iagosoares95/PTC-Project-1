@@ -12,9 +12,8 @@ class Link:
         self.tun = Tun("tun1", ip1, ip2, mask="255.255.255.252", mtu=1500, qlen=4)
         self.tun.start()
         self.pol = poller.Poller()
-        if(client_type == "s"):
-            self.tun_callback = TunCallback(self.tun,self)
-            self.pol.adiciona(self.tun_callback)
+        self.tun_callback = TunCallback(self.tun,self)
+        self.pol.adiciona(self.tun_callback)
         self.serial_callback = SerialCallback(self)
         self.pol.adiciona(self.serial_callback)
         self.pol.despache()
@@ -32,7 +31,7 @@ class Link:
 
 class TunCallback(poller.Callback):
     def __init__(self, tun, link):
-        poller.Callback.__init__(self, tun.fd)
+        poller.Callback.__init__(self, tun.fd, 1000)
         self.tun1 = tun
         self.link = link
 

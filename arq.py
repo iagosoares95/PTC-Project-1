@@ -4,20 +4,24 @@ import framing
 from enum import Enum
 
 class Arq:
-    def __init__(self, framing):
-        self.fra = framingz
+    def __init__(self, framing, session__id):
+        self.fra = framing
         self.States = Enum('States', 'idle waiting')
         self.state = self.States.idle
         self.Eventtype = Enum('EventType', 'payload frame timeout')
         self.event = None
         self.buffer = bytearray()
+        self.ns_frame = 0
+        self.session_id = session__id
+        self.s_data = bytearray()
 
     def send(self, data):
         if(data == bytearray()):
             return
         self.event = self.Eventtype.payload
-        self.data = data
+        self.s_data = data
         self.handle_state(self.event)
+        return
 
     def receive(self):
         self.buffer = self.fra.received()
@@ -38,10 +42,29 @@ class Arq:
 
     def idle_func(self, event):
         if(self.event == self.Eventtype.payload):
-        
+            return self.make_payload()
+
         elif(self.event == self.Eventtype.frame):
+            return self.frame_func()
 
     def waiting_func(self, event):        
         if(self.event == self.Eventtype.payload):
         
         elif(self.event == self.Eventtype.frame):
+
+    def make_payload(self):
+        ctrl = 0b00000000
+        if(self.ns_frame = 1):
+            ctrl = ctrl | 0b00001000
+            self.ns_frame = 0
+        else:
+            self.ns_frame = 1
+
+        send_data = bytes([ctrl]) + bytes([session_id]) + self.s_data
+        self.fra.send(send_data)
+        return self.States.waiting
+        
+    def frame_func(self):
+        if():
+
+    def ack_func(self):
