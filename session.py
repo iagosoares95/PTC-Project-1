@@ -19,6 +19,7 @@ class Session:
         self.start = False
         self.recv_data = bytearray()
         self.proto = b'\xff'
+        self.s_data = bytearray()
 
     def begin(self):
         if(self.states == seld.States.con):
@@ -72,7 +73,7 @@ class Session:
             self.CR_func()
             return self.States.hand1
         else:
-            if()
+            if():
 
     def hand1_func(self):
         if(len(self.recv_data) == 0):
@@ -83,21 +84,27 @@ class Session:
     def hand2_func(self):
         if(len(self.recv_data) == 0):
             return self.States.hand2
-        if()            
+        if():           
 
     def hand3_func(self):
 
     def con_func(self):
-
+        if(self.s_data != bytearray()):
+            self.arq.send(s_data)
+            return self.States.con
+            
     def check_func(self):
 
     def half1_func(self):
         if(len(self.recv_data) == 0):
             self.DR_func()
             return self.States.half1
-        if()
+        if():
 
     def half2_func(self):
+        if(len(self.recv_data) == 0):
+            return self.States.disc
+        if():
 
     def CR_func(self):
         send_data = self.proto + sel.CR
@@ -106,3 +113,5 @@ class Session:
     def DR_func(self):
         send_data = self.proto + self.DR
         self.arq.send(send_data)
+
+    def timeout_func(self):

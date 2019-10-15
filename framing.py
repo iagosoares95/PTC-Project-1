@@ -78,3 +78,5 @@ class Framing:
         trans_byte = byte[0] ^ 0x20
         self.buffer = self.buffer + bytes([trans_byte])
         return self.States.rx
+
+    def timeout_func(self):

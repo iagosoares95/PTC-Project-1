@@ -43,14 +43,20 @@ class Arq:
     def idle_func(self, event):
         if(self.event == self.Eventtype.payload):
             return self.make_payload()
-
         elif(self.event == self.Eventtype.frame):
             return self.frame_func()
 
     def waiting_func(self, event):        
         if(self.event == self.Eventtype.payload):
-        
+            self.buffer = self.fra.receive()
+            if(self.buffer == bytearray()):
+                return self.States.waiting
+            return self.frame_func()        
         elif(self.event == self.Eventtype.frame):
+            if(self.buffer == bytearray()):
+                return self.States.idle
+            return self.frame_func()
+        reurn self.States.waiting
 
     def make_payload(self):
         ctrl = 0b00000000
@@ -67,4 +73,8 @@ class Arq:
     def frame_func(self):
         if():
 
-    def ack_func(self):
+    def make_ack(self):
+        ack = bytes([ctrl]) + bytes([self.session_id])
+        self.fra.send(ack)
+
+    def timeout_func(self):
