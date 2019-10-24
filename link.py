@@ -4,9 +4,10 @@ from tun import Tun
 import framing
 import serial
 import poller
+import sessao
 
 class Link:
-    def __init__(self, serial_port, ip1, ip2, client_type):
+    def __init__(self, serial_port, ip1, ip2, client_type, session_id):
         self.serial = serial.Serial(serial_port, 9600)
         self.fra = framing.Framing(self.serial)
         self.tun = Tun("tun1", ip1, ip2, mask="255.255.255.252", mtu=1500, qlen=4)
@@ -17,10 +18,15 @@ class Link:
         self.serial_callback = SerialCallback(self)
         self.pol.adiciona(self.serial_callback)
         self.pol.despache()
+        self.session = session_id
 
     def send(self, data):
+        if(self.session.conected() == False):
+            self.session.begin()
+            return
         print("Dado: ", data)
-        self.fra.send(data)
+        return self.session.send(data)
+
 
     def received(self):
         buffer = self.fra.receive()

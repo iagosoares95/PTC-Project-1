@@ -4,6 +4,7 @@
 from enum import Enum
 import ARQ
 import link
+import time
 
 class Session:
     def __init__(self, arq, timeout):
@@ -20,6 +21,7 @@ class Session:
         self.recv_data = bytearray()
         self.proto = b'\xff'
         self.s_data = bytearray()
+        self.l_time = time.time()
 
     def begin(self):
         if(self.states == seld.States.con):
@@ -34,7 +36,15 @@ class Session:
         self.DR_func()
         seld.states = self.States.half1
 
+    def conected(self):
+        if(self.states == self.States.con):
+            return True
+        else: 
+            return False
+
     def send(self):
+        if(self.states != self.States.con):
+            return 
 
     def receive(self):
         self.recv_data = self.arq.receive()
@@ -115,3 +125,5 @@ class Session:
         self.arq.send(send_data)
 
     def timeout_func(self):
+        if(self.states == self.States.hand1):
+            self.diff_time = time.time() - self
