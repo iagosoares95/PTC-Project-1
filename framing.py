@@ -3,14 +3,20 @@
 import serial
 import crc
 from enum import Enum
+from binascii import unhexlify
+import time
 
 class Framing:
 
-    def __init__(self, serial):
+    def __init__(self, serial, timeout):
         self.States = Enum('States', 'idle rx esc')
         self.state = self.States.idle
         self.buffer = bytearray()
         self.ser = serial
+        self.timeout = timeout
+        self.l_time = time.time()
+        self.ser.reset_input_buffer()
+        self.ser.reset_output_buffer()
 
     def send(self, data):
         final_data = bytearray()
@@ -66,6 +72,7 @@ class Framing:
             return self.States.idle
             
     def rx_func(self, byte):
+        self.l_time = time.time()
         if(byte == b'\x7E'):
             return self.States.idle
         elif(byte == b'\x7D'):
@@ -75,8 +82,15 @@ class Framing:
             return self.States.rx
 
     def esc_func(self, byte):
+        self.l_time = time.time()
         trans_byte = byte[0] ^ 0x20
         self.buffer = self.buffer + bytes([trans_byte])
         return self.States.rx
 
     def timeout_func(self):
+        if(self.state in [self.States.rx, self.States.esc]):
+            diff_time = time.time() - self.l_time
+            if(diff_time > self.timeout):
+                print("Timeout framing")
+                self.buffer = bytearray()
+                self.state = self.States.idle

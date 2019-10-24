@@ -29,6 +29,9 @@ class Link:
             print(buffer)
             self.tun.send_frame(buffer, Tun.PROTO_IPV4)
 
+    def timeout_func(self):
+        self.
+
 class TunCallback(poller.Callback):
     def __init__(self, tun, link):
         poller.Callback.__init__(self, tun.fd, 1000)
@@ -50,3 +53,11 @@ class SerialCallback(poller.Callback):
         recv_data = self.serial1.read()
         if(recv_data != bytearray()):
             self.serial1.read()
+
+class TimeoutCallback(poller.Callback):
+    def __init__(self, link, timeout):
+        poller.Callback.__init__(self, None, timeout)
+        self.link1 = link
+
+    def handle_timeout(self):
+        self.link1.ttimeout_func()

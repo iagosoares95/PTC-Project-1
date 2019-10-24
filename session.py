@@ -6,7 +6,7 @@ import ARQ
 import link
 
 class Session:
-    def __init__(self, arq):
+    def __init__(self, arq, timeout):
         self.States = Enum('States', 'disc hand1 hand2 hand3 con check half1 half2')
         self.states = self.State.disc
         self.arq = arq
