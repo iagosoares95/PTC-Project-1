@@ -120,3 +120,9 @@ além de enviar e receber quadros através desse tipo de interface'''
         flag |= Tun.IFF_UP | Tun.IFF_RUNNING
         ifr = struct.pack('16sH22x', self.name, flag)        
         fcntl.ioctl(s, Tun.SIOCSIFFLAGS, ifr)
+        
+        
+        
+        
+        
+        

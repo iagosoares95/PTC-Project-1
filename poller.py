@@ -129,10 +129,10 @@ class Poller:
       pass
 
   def _get_events(self, timeout):
-    sched = selectors.DefaultSelector()
+    sched = selectors.SelectSelector()
     active = False
     for cb in self.cbs:
-      if cb.isEnabled: 
+      if cb.isEnabled:
         sched.register(cb.fd, selectors.EVENT_READ, cb)
         active = True
     if not active and timeout == None:
